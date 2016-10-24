@@ -1,0 +1,37 @@
+syntax = "proto3";
+package models;
+
+message Error {
+  enum Type {
+    UnknownError = 0;
+    InvalidDomain = 1;
+
+    UnkownVersion          = 2;
+    InvalidRecord          = 3;
+    InvalidRequest         = 4;
+    InvalidResponse        = 5;
+    InvalidProtobufMessage = 6;
+    InvalidJSON            = 7;
+    FailedToOpenEnvelope   = 8;
+    InvalidStateTransition = 9;
+
+    Unauthorized = 10;
+
+    ResourceConflict = 11;
+    ResourceExists   = 12;
+    ResourceNotFound = 13;
+    RouterError      = 14;
+
+    SoftLayerAPIError   = 15;
+
+    GUIDGeneration = 26;
+
+    Deserialize = 27;
+
+    Deadlock = 28;
+    Unrecoverable = 29;
+  }
+
+  Type type = 1;
+  string message = 2;
+}

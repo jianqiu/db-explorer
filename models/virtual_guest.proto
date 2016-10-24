@@ -1,0 +1,28 @@
+syntax = "proto3";
+package models;
+
+message VirtualGuest {
+    enum State {
+        Using = 0;
+        Deleted = 1;
+        Unavailable = 2;
+    }
+    int32 cid = 1;
+    string hostname = 2;
+    int32 cpu = 3;
+    int32 memory = 4;
+    int32 public_vlan = 5;
+    int32 private_vlan = 6;
+    State state = 7;
+
+  string deployment_name = 8;
+
+  string ip =10;
+
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message VirtualGuests {
+  repeated VirtualGuest virtual_guest = 1;
+}
