@@ -1,0 +1,134 @@
+swagger: '2.0'
+info:
+  description: This is a VM pool server for prototype.
+  version: "1.0.0"
+  title: VM Pool Server
+  contact:
+    name: cuixuex@cn.ibm.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+host: 127.0.0.1
+basePath: /v1
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /vms:
+    get:
+      tags:
+        - VMs
+      summary: Get info of all VMs in the pool
+      description: Get info of all VMs in the pool
+      parameters:
+        - in: query
+          name: status
+          description: filter VMs by status 
+          required: false
+          type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/VM'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /pool/returnvm:
+    post:
+      tags:
+        - Pool
+      summary: Return a VM into the pool
+      description: Return a VM into the pool
+      operationId: returnVM
+      parameters:
+        - in: query
+          name: vm_id
+          description: VM ID 
+          required: true
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: Returning a VM into the pool succeeded
+          schema:
+            $ref: '#/definitions/VM'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /pool/requestvm:
+    post:
+      tags:
+        - Pool
+      summary:  Request a VM from the pool
+      description: Request a VM from the pool
+      operationId: requestVM
+      parameters:
+        - in: query
+          name: vm_id
+          description: VM ID
+          required: false
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: Requesting a VM from the pool succeeded
+          schema:
+            $ref: '#/definitions/VM'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  VM:
+    type: object
+    properties:
+      vm_id:
+        type: integer
+        format: int32
+        description: VM id
+      memory:
+        type: integer
+        format: int32
+        description: Memory size
+      cpu:
+        type: integer
+        format: int32
+        description: cpu core
+      hostname:
+        type: string
+        description: hostname of VM
+      public_vlan:
+        type: integer
+        format: int32
+        description: PrimaryNetworkVlan
+      private_vlan:
+        type: integer
+        format: int32
+        description: PrimaryBackendNetworkVlan
+      private_ip:
+        type: string
+        description: Private IP
+      status:
+        type: string
+        description: Status of VM in Pool
+      deployment:
+        type: string
+        description: The name of the deployment the VM belongs to
+  Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        fields:
+          type: string
