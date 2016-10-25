@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package models;
+
+import "virtual_guest.proto";
+import "error.proto";
+
+message VMLifecycleResponse {
+    Error error = 1;
+}
+
+message VMsRequest{
+    int32 public_vlan = 1;
+    int32 private_vlan = 2;
+    int32 cpu = 3;
+    int32 memory_mb = 4;
+}
+
+message VMsResponse{
+    Error error = 1;
+    VirtualGuest vms = 2;
+}
+
+message VMByCidRequest{
+    string cid = 1;
+}
+
+message VMResponse{
+    Error error = 1;
+    VirtualGuest vm = 2;
+}

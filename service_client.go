@@ -1,9 +1,9 @@
-package db
+package vps
 
 import (
 	"fmt"
 
-	"github.com/vm-pool-server/db/models"
+	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/lager"
 
 	"github.com/softlayer/softlayer-go/services"
@@ -11,7 +11,7 @@ import (
 	"github.com/softlayer/softlayer-go/sl"
 )
 
-//go:generate counterfeiter -o fake_bbs/fake_service_client.go . ServiceClient
+//go:generate counterfeiter -o fake_vps/fake_service_client.go . ServiceClient
 
 type ServiceClient interface {
 	VirtualGuestById(logger lager.Logger, cid int32) (*models.VirtualGuest, error)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vm-pool-server/models"
+	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/lager"
 )
 
@@ -35,7 +35,7 @@ var (
 		virtualGuests + ".hostname",
 		virtualGuests + ".ip",
 		virtualGuests + ".cpu",
-		virtualGuests + ".memory",
+		virtualGuests + ".memory_mb",
 		virtualGuests + ".private_vlan",
 		virtualGuests + ".public_vlan",
 		virtualGuests + ".deployment_name",

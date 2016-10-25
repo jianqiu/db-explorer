@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/vm-pool-server/models"
+	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/clock"
 	"code.cloudfoundry.org/lager"
 	"github.com/go-sql-driver/mysql"

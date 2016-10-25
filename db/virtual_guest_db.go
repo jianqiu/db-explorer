@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/vm-pool-server/models"
+	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/lager"
 )
 
