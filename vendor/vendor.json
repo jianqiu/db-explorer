@@ -1,0 +1,33 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "c6kmkiVQI2cr0Rjk8hfyLQJw678=",
+			"path": "code.cloudfoundry.org/lager",
+			"revision": "b273f19621a28f627423f658e71e014f114dd53e",
+			"revisionTime": "2016-10-21T17:39:21Z"
+		},
+		{
+			"checksumSHA1": "FczzogSoZcKU3h21tCUyHzMsnBY=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "7cc19b78d562895b13596ddce7aafb59dd789318",
+			"revisionTime": "2016-04-25T21:53:00Z"
+		},
+		{
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
+			"origin": "github.com/mattcui/vm-pool-server/vendor/github.com/gorilla/context",
+			"path": "github.com/gorilla/context",
+			"revision": "920551613fc2e2a353620dd60c5795ce4d06e00b",
+			"revisionTime": "2016-10-20T07:13:19Z"
+		},
+		{
+			"checksumSHA1": "urMd7A9QPAJYY0GZJL9qBhlUmD8=",
+			"origin": "github.com/mattcui/vm-pool-server/vendor/github.com/gorilla/mux",
+			"path": "github.com/gorilla/mux",
+			"revision": "920551613fc2e2a353620dd60c5795ce4d06e00b",
+			"revisionTime": "2016-10-20T07:13:19Z"
+		}
+	],
+	"rootPath": "github.com/jianqiu/vm-pool-server"
+}
