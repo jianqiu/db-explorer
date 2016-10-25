@@ -72,7 +72,7 @@ readyChan chan<- struct{},
 		"init":   "virtual_guest_db",
 	})
 
-        if checkTables(m.rawSQLDB) {
+        if checkTables(logger, m.rawSQLDB) {
 	       err := createTables(logger, m.rawSQLDB, m.databaseDriver)
 	       if err != nil {
 		       errorChan <- err
@@ -103,7 +103,7 @@ func (m *Manager) finish(logger lager.Logger, ready chan<- struct{}) {
 }
 
 
-func checkTables(db *sql.DB) bool {
+func checkTables(logger lager.Logger, db *sql.DB) bool {
 	tableNames := []string{
 		"virtual_guests",
 	}
@@ -111,7 +111,8 @@ func checkTables(db *sql.DB) bool {
 		var value int
 		// check whether the table exists before truncating
 		err := db.QueryRow("SELECT 1 FROM ? LIMIT 1;", tableName).Scan(&value)
-		if err == sql.ErrNoRows {
+		logger.Info("checking tables", lager.Data{"value": value})
+		if err != nil {
 			return true
 		}
 	}
