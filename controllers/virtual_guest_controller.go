@@ -33,7 +33,7 @@ func (h *VirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan, 
 	return h.db.VirtualGuests(logger, filter)
 }
 
-func (h *VirtualGuestController) VirtualGuestByCid(logger lager.Logger, cid string) (*models.VirtualGuest, error) {
+func (h *VirtualGuestController) VirtualGuestByCid(logger lager.Logger, cid int32) (*models.VirtualGuest, error) {
 	logger = logger.Session("vm-by-guid")
 	return h.db.VirtualGuestByCID(logger, cid)
 }

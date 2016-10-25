@@ -18,17 +18,17 @@ type ServiceClient interface {
 }
 
 type serviceClient struct {
-	softlayerClient session
+	Session *session.Session
 }
 
 func NewServiceClient(username string, apikey string) ServiceClient {
 	return &serviceClient{
-		softlayerClient: session.New(username,apikey),
+		Session: session.New(username,apikey),
 	}
 }
 
 func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*models.VirtualGuest, error) {
-	service := services.GetVirtualGuestService(slc.softlayerClient)
+	service := services.GetVirtualGuestService(slc.Session)
 	mask := "mask[id, globalIdentifier, hostname, domain, fullyQualifiedDomainName, status.name, " +
 	"powerState.name, activeTransaction, datacenter.name, " +
 	"operatingSystem[softwareLicense[softwareDescription[name,version]],passwords[username,password]], " +
@@ -36,7 +36,7 @@ func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*mod
 	"privateNetworkOnlyFlag, dedicatedAccountHostOnlyFlag, createDate, modifyDate, " +
 	"billingItem[nextInvoiceTotalRecurringAmount, children[nextInvoiceTotalRecurringAmount]], notes, tagReferences.tag.name, networkVlans[id,vlanNumber,networkSpace]]"
 
-	sl_virtual_guest, err := service.Id(cid).Mask(mask).GetObject()
+	sl_virtual_guest, err := service.Id(int(cid)).Mask(mask).GetObject()
 	if err != nil {
 		// Note: type assertion is only necessary for inspecting individual fields
 		apiErr := err.(sl.Error)
@@ -45,20 +45,20 @@ func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*mod
 
 	virtual_guest := models.VirtualGuest{}
 
-	virtual_guest.Cid = *sl_virtual_guest.Id
+	virtual_guest.Cid = int32(*sl_virtual_guest.Id)
 	virtual_guest.Hostname = *sl_virtual_guest.Hostname
 	virtual_guest.Ip = *sl_virtual_guest.PrimaryBackendIpAddress
-	virtual_guest.Cpu = *sl_virtual_guest.MaxCpu
-	virtual_guest.Memory = *sl_virtual_guest.MaxMemory
+	virtual_guest.Cpu = int32(*sl_virtual_guest.MaxCpu)
+	virtual_guest.MemoryMb = int32(*sl_virtual_guest.MaxMemory)
 
 	if vlans := sl_virtual_guest.NetworkVlans; len(vlans) > 0 {
 		for _, vlan := range vlans {
 			if vlan.NetworkSpace != nil && vlan.VlanNumber != nil && vlan.Id != nil {
 				switch *vlan.NetworkSpace {
 				case "PRIVATE":
-					virtual_guest.PrivateVlan = *vlan.Id
+					virtual_guest.PrivateVlan = int32(*vlan.Id)
 				case "PUBLIC":
-					virtual_guest.PublicVlan = *vlan.Id
+					virtual_guest.PublicVlan = int32(*vlan.Id)
 				default:
 					return nil, models.NewError(models.Error_SoftLayerAPIError,"invalid vlan.Networkspace")
 				}

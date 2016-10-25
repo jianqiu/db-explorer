@@ -16,17 +16,17 @@ func (db *SQLDB) VirtualGuests(logger lager.Logger, filter models.VirtualGuestFi
 	wheres := []string{}
 	values := []interface{}{}
 
-	if filter.CID != "" {
+	if filter.CID != 0 {
 		wheres = append(wheres, "cid = ?")
 		values = append(values, filter.CID)
 	}
 
-	if filter.PrivateVlan != "" {
+	if filter.PrivateVlan != 0 {
 		wheres = append(wheres, "private_vlan = ?")
 		values = append(values, filter.PrivateVlan)
 	}
 
-	if filter.PublicVlan != "" {
+	if filter.PublicVlan != 0 {
 		wheres = append(wheres, "public_vlan = ?")
 		values = append(values, filter.PublicVlan)
 	}
@@ -96,13 +96,13 @@ func (db *SQLDB) InsertVirtualGuestToPool(logger lager.Logger, virtualGuest *mod
 			"hostname":          virtualGuest.Hostname,
 			"ip":		     virtualGuest.Ip,
 			"cpu":		     virtualGuest.Cpu,
-			"memory":            virtualGuest.Memory,
+			"memory_mb":         virtualGuest.MemoryMb,
 			"public_vlan":	     virtualGuest.PublicVlan,
 			"private_vlan":      virtualGuest.PrivateVlan,
 			"create_at":          now,
 			"updated_at":         now,
 			"deployment_name":    virtualGuest.DeploymentName,
-			"state":              models.VirtualGuest_Deleted,
+			"state":              models.Deleted,
 		},
 	)
 	if err != nil {
@@ -125,7 +125,7 @@ func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) (bool, 
 			return err
 		}
 
-		if err = task.ValidateTransitionTo(models.VirtualGuest_Using); err != nil {
+		if err = task.ValidateTransitionTo(models.Using); err != nil {
 			logger.Error("failed-to-transition-task-to-running", err)
 			return err
 		}
@@ -135,7 +135,7 @@ func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) (bool, 
 		now := db.clock.Now().UnixNano()
 		_, err = db.update(logger, tx, virtualGuests,
 			SQLAttributes{
-				"state":      models.VirtualGuest_Using,
+				"state":      models.Using,
 				"updated_at": now,
 			},
 			"cid = ?", cid,
@@ -163,7 +163,7 @@ func (db *SQLDB) ChangeVirtualGuestToDeleted(logger lager.Logger, cid int32) (bo
 			return err
 		}
 
-		if err = task.ValidateTransitionTo(models.VirtualGuest_Deleted); err != nil {
+		if err = task.ValidateTransitionTo(models.Deleted); err != nil {
 			logger.Error("failed-to-transition-task-to-deleted", err)
 			return err
 		}
@@ -173,7 +173,7 @@ func (db *SQLDB) ChangeVirtualGuestToDeleted(logger lager.Logger, cid int32) (bo
 		now := db.clock.Now().UnixNano()
 		_, err = db.update(logger, tx, virtualGuests,
 			SQLAttributes{
-				"state":      models.VirtualGuest_Deleted,
+				"state":      models.Deleted,
 				"updated_at": now,
 			},
 			"cid = ?", cid,
@@ -201,8 +201,8 @@ func (db *SQLDB) DeleteVirtualGuestFromPool(logger lager.Logger, cid int32) erro
 			return err
 		}
 
-		if task.State != models.VirtualGuest_Deleted {
-			err = models.NewTaskTransitionError(task.State, models.VirtualGuest_Unavailable)
+		if task.State != models.Deleted {
+			err = models.NewTaskTransitionError(task.State, models.Unavailable)
 			logger.Error("invalid-state-transition", err)
 			return err
 		}
@@ -226,15 +226,16 @@ func (db *SQLDB) fetchTaskForUpdate(logger lager.Logger, cid int32, tx *sql.Tx) 
 }
 
 func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Queryable) (*models.VirtualGuest, error) {
-	var hostname, ip, cpu, memory, deployment_name string
-	var cid, state, public_vlan, private_vlan int32
+	var hostname, ip, deployment_name string
+	var cpu, memory_mb, cid, public_vlan, private_vlan int32
+	var state interface{}
 
 	err := scanner.Scan(
 		&cid,
 		&hostname,
 		&ip,
 		&cpu,
-		&memory,
+		&memory_mb,
 		&private_vlan,
 		&public_vlan,
 		&deployment_name,
@@ -245,16 +246,16 @@ func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Q
 		return nil, models.ErrResourceNotFound
 	}
 
-	virtualGuest := &models.VirtualGuest{
+	virtualGuest := &models.VirtualGuest {
 		Cid:              cid,
 		Hostname:         hostname,
 		Ip:               ip,
 		Cpu:    	  cpu,
-		Memory: 	  memory,
+		MemoryMb: 	  memory_mb,
 		PrivateVlan:      private_vlan,
 		PublicVlan:       public_vlan,
 		DeploymentName:   deployment_name,
-		State:            state,
+		State:            state.(models.VirtualGuest_State),
 	}
 	return virtualGuest, nil
 }

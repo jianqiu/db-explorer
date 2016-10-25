@@ -1,5 +1,11 @@
-syntax = "proto3";
+syntax = "proto2";
+
 package models;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.equal_all) = false;
+option (gogoproto.goproto_enum_prefix_all) = true;
 
 message Error {
   enum Type {
@@ -32,6 +38,8 @@ message Error {
     Unrecoverable = 29;
   }
 
-  Type type = 1;
-  string message = 2;
+  optional Type type = 1 [(gogoproto.nullable) = false];
+  optional string message = 2 [(gogoproto.nullable) = false];
 }
+
+

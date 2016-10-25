@@ -92,7 +92,7 @@ func main() {
 			logger.Fatal("sql-failed-to-connect", err)
 		}
 
-		sqlDB = sqldb.NewSQLDB(sqlConn,  clock, *databaseDriver)
+		sqlDB = sqldb.NewSQLDB(sqlConn, clock, *databaseDriver)
 		err = sqlDB.CreateConfigurationsTable(logger)
 		if err != nil {
 			logger.Fatal("sql-failed-create-configurations-table", err)

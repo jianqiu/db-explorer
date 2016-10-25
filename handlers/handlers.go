@@ -9,7 +9,7 @@ import (
 	"github.com/jianqiu/vm-pool-server/controllers"
 	"github.com/jianqiu/vm-pool-server/db"
 	"github.com/jianqiu/vm-pool-server/handlers/middleware"
-	"code.cloudfoundry.org/bbs/models"
+	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/lager"
 	"github.com/gogo/protobuf/proto"
 	"github.com/tedsuo/rata"

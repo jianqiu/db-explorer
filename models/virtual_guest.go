@@ -2,27 +2,22 @@ package models
 
 import (
 	"fmt"
-	"regexp"
 )
-
-var taskGuidPattern = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 type VirtualGuestFilter struct {
 	CID int32
 	IP string
-	PublicVlan string
-	PrivateVlan string
+	CPU int32
+	Memory_mb int32
+	PublicVlan int32
+	PrivateVlan int32
 }
 
 func (vg *VirtualGuest) Validate() error {
 	var validationError ValidationError
 
-	if vg.Cid == "" {
+	if vg.Cid == 0 {
 		validationError = validationError.Append(ErrInvalidField{"cid"})
-	}
-
-	if !taskGuidPattern.MatchString(vg.Cid) {
-		validationError = validationError.Append(ErrInvalidField{"task_guid"})
 	}
 
 	if !validationError.Empty() {
@@ -41,12 +36,12 @@ func (t *VirtualGuest) ValidateTransitionTo(to VirtualGuest_State) error {
 	var valid bool
 	from := t.State
 	switch to {
-	case VirtualGuest_Using:
-		valid = from == VirtualGuest_Deleted
-	case VirtualGuest_Deleted:
-		valid = (from == VirtualGuest_Deleted || from == VirtualGuest_Using)
-	case VirtualGuest_Unavailable:
-		valid = from == VirtualGuest_Deleted
+	case Using:
+		valid = from == Deleted
+	case Deleted:
+		valid = (from == Deleted || from == Using)
+	case Unavailable:
+		valid = from == Deleted
 	}
 
 	if !valid {

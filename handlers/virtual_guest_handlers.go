@@ -46,7 +46,7 @@ func (h *VirtualGuestHandler) VirtualGuests(logger lager.Logger, w http.Response
 		return
 	}
 
-	response.Vms, err = h.controller.VirtualGuests(logger, request.PublicVlan)
+	response.Vms, err = h.controller.VirtualGuests(logger, request.PublicVlan, request.PrivateVlan, request.Cpu, request.MemoryMb)
 	response.Error = models.ConvertError(err)
 }
 

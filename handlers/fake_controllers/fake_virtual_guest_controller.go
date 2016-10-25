@@ -10,22 +10,24 @@ import (
 )
 
 type FakeVirtualGuestController struct {
-	VirtualGuestsStub        func(logger lager.Logger, domain, cellId string) ([]*models.VirtualGuest, error)
+	VirtualGuestsStub        func(logger lager.Logger, publicVlan, privateVlan, cpu, memory_mb int32) ([]*models.VirtualGuest, error)
 	virtualGuestsMutex       sync.RWMutex
 	virtualGuestsArgsForCall []struct {
-		logger lager.Logger
-		domain string
-		cellId string
+		logger      lager.Logger
+		publicVlan  int32
+		privateVlan int32
+		cpu         int32
+		memory_mb   int32
 	}
 	virtualGuestsReturns struct {
 		result1 []*models.VirtualGuest
 		result2 error
 	}
-	VirtualGuestByCidStub        func(logger lager.Logger, taskGuid string) (*models.VirtualGuest, error)
+	VirtualGuestByCidStub        func(logger lager.Logger, cid int32) (*models.VirtualGuest, error)
 	virtualGuestByCidMutex       sync.RWMutex
 	virtualGuestByCidArgsForCall []struct {
-		logger   lager.Logger
-		taskGuid string
+		logger lager.Logger
+		cid    int32
 	}
 	virtualGuestByCidReturns struct {
 		result1 *models.VirtualGuest
@@ -35,17 +37,19 @@ type FakeVirtualGuestController struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeVirtualGuestController) VirtualGuests(logger lager.Logger, domain string, cellId string) ([]*models.VirtualGuest, error) {
+func (fake *FakeVirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan int32, privateVlan int32, cpu int32, memory_mb int32) ([]*models.VirtualGuest, error) {
 	fake.virtualGuestsMutex.Lock()
 	fake.virtualGuestsArgsForCall = append(fake.virtualGuestsArgsForCall, struct {
-		logger lager.Logger
-		domain string
-		cellId string
-	}{logger, domain, cellId})
-	fake.recordInvocation("VirtualGuests", []interface{}{logger, domain, cellId})
+		logger      lager.Logger
+		publicVlan  int32
+		privateVlan int32
+		cpu         int32
+		memory_mb   int32
+	}{logger, publicVlan, privateVlan, cpu, memory_mb})
+	fake.recordInvocation("VirtualGuests", []interface{}{logger, publicVlan, privateVlan, cpu, memory_mb})
 	fake.virtualGuestsMutex.Unlock()
 	if fake.VirtualGuestsStub != nil {
-		return fake.VirtualGuestsStub(logger, domain, cellId)
+		return fake.VirtualGuestsStub(logger, publicVlan, privateVlan, cpu, memory_mb)
 	} else {
 		return fake.virtualGuestsReturns.result1, fake.virtualGuestsReturns.result2
 	}
@@ -57,10 +61,10 @@ func (fake *FakeVirtualGuestController) VirtualGuestsCallCount() int {
 	return len(fake.virtualGuestsArgsForCall)
 }
 
-func (fake *FakeVirtualGuestController) VirtualGuestsArgsForCall(i int) (lager.Logger, string, string) {
+func (fake *FakeVirtualGuestController) VirtualGuestsArgsForCall(i int) (lager.Logger, int32, int32, int32, int32) {
 	fake.virtualGuestsMutex.RLock()
 	defer fake.virtualGuestsMutex.RUnlock()
-	return fake.virtualGuestsArgsForCall[i].logger, fake.virtualGuestsArgsForCall[i].domain, fake.virtualGuestsArgsForCall[i].cellId
+	return fake.virtualGuestsArgsForCall[i].logger, fake.virtualGuestsArgsForCall[i].publicVlan, fake.virtualGuestsArgsForCall[i].privateVlan, fake.virtualGuestsArgsForCall[i].cpu, fake.virtualGuestsArgsForCall[i].memory_mb
 }
 
 func (fake *FakeVirtualGuestController) VirtualGuestsReturns(result1 []*models.VirtualGuest, result2 error) {
@@ -71,16 +75,16 @@ func (fake *FakeVirtualGuestController) VirtualGuestsReturns(result1 []*models.V
 	}{result1, result2}
 }
 
-func (fake *FakeVirtualGuestController) VirtualGuestByCid(logger lager.Logger, taskGuid string) (*models.VirtualGuest, error) {
+func (fake *FakeVirtualGuestController) VirtualGuestByCid(logger lager.Logger, cid int32) (*models.VirtualGuest, error) {
 	fake.virtualGuestByCidMutex.Lock()
 	fake.virtualGuestByCidArgsForCall = append(fake.virtualGuestByCidArgsForCall, struct {
-		logger   lager.Logger
-		taskGuid string
-	}{logger, taskGuid})
-	fake.recordInvocation("VirtualGuestByCid", []interface{}{logger, taskGuid})
+		logger lager.Logger
+		cid    int32
+	}{logger, cid})
+	fake.recordInvocation("VirtualGuestByCid", []interface{}{logger, cid})
 	fake.virtualGuestByCidMutex.Unlock()
 	if fake.VirtualGuestByCidStub != nil {
-		return fake.VirtualGuestByCidStub(logger, taskGuid)
+		return fake.VirtualGuestByCidStub(logger, cid)
 	} else {
 		return fake.virtualGuestByCidReturns.result1, fake.virtualGuestByCidReturns.result2
 	}
@@ -92,10 +96,10 @@ func (fake *FakeVirtualGuestController) VirtualGuestByCidCallCount() int {
 	return len(fake.virtualGuestByCidArgsForCall)
 }
 
-func (fake *FakeVirtualGuestController) VirtualGuestByCidArgsForCall(i int) (lager.Logger, string) {
+func (fake *FakeVirtualGuestController) VirtualGuestByCidArgsForCall(i int) (lager.Logger, int32) {
 	fake.virtualGuestByCidMutex.RLock()
 	defer fake.virtualGuestByCidMutex.RUnlock()
-	return fake.virtualGuestByCidArgsForCall[i].logger, fake.virtualGuestByCidArgsForCall[i].taskGuid
+	return fake.virtualGuestByCidArgsForCall[i].logger, fake.virtualGuestByCidArgsForCall[i].cid
 }
 
 func (fake *FakeVirtualGuestController) VirtualGuestByCidReturns(result1 *models.VirtualGuest, result2 error) {
