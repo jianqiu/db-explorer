@@ -43,15 +43,15 @@ func configureAPI(api *operations.VMPoolServerAPI) http.Handler {
 
 		requestVM := pool.NewRequestVMOK()
 		vm := models.VM{
-			CPU:         4,
+			CPU:         params.Body.CPU,
 			Deployment:  "test-deployment",
 			Hostname:    "test-hostname",
-			Memory:      32768,
+			Memory:      params.Body.Memory,
 			PrivateIP:   "10.0.0.99",
-			PrivateVlan: 123456,
-			PublicVlan:  123457,
+			PrivateVlan: params.Body.PrivateVlan,
+			PublicVlan:  params.Body.PublicVlan,
 			Status:      "in_req",
-			VMID:        *params.VMID,
+			VMID:        params.Body.VMID,
 		}
 		requestVM.SetPayload(&vm)
 		return requestVM

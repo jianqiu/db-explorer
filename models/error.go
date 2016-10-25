@@ -11,7 +11,7 @@ import (
 
 // Error error
 // swagger:model Error
-type ErrorOpenAPI struct {
+type ErrorPool struct {
 
 	// code
 	Code int32 `json:"code,omitempty"`

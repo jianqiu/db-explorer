@@ -66,12 +66,13 @@
                 "operationId": "returnVM",
                 "parameters": [
                     {
-                        "in": "query",
-                        "name": "vm_id",
+                        "in": "body",
+                        "name": "body",
                         "description": "VM ID",
                         "required": true,
-                        "type": "integer",
-                        "format": "int32"
+                        "schema": {
+                            "$ref": "#/definitions/VMID"
+                        }
                     }
                 ],
                 "responses": {
@@ -100,12 +101,13 @@
                 "operationId": "requestVM",
                 "parameters": [
                     {
-                        "in": "query",
-                        "name": "vm_id",
-                        "description": "VM ID",
-                        "required": false,
-                        "type": "integer",
-                        "format": "int32"
+                        "in": "body",
+                        "name": "body",
+                        "description": "VM",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VM"
+                        }
                     }
                 ],
                 "responses": {
@@ -159,8 +161,7 @@
                     "description": "PrimaryBackendNetworkVlan"
                 },
                 "private_ip": {
-                    "type": "integer",
-                    "format": "string",
+                    "type": "string",
                     "description": "Private IP"
                 },
                 "status": {
@@ -172,6 +173,10 @@
                     "description": "The name of the deployment the VM belongs to"
                 }
             }
+        },
+        "VMID": {
+            "type": "integer",
+            "format": "int32"
         },
         "Error": {
             "type": "object",

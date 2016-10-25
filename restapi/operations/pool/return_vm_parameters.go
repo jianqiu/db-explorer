@@ -4,15 +4,14 @@ package pool
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/jianqiu/vm-pool-server/models"
 )
 
 // NewReturnVMParams creates a new ReturnVMParams object
@@ -33,9 +32,9 @@ type ReturnVMParams struct {
 
 	/*VM ID
 	  Required: true
-	  In: query
+	  In: body
 	*/
-	VMID int32
+	Body models.VMID
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -44,36 +43,29 @@ func (o *ReturnVMParams) BindRequest(r *http.Request, route *middleware.MatchedR
 	var res []error
 	o.HTTPRequest = r
 
-	qs := runtime.Values(r.URL.Query())
+	if runtime.HasBody(r) {
+		defer r.Body.Close()
+		var body models.VMID
+		if err := route.Consumer.Consume(r.Body, &body); err != nil {
+			if err == io.EOF {
+				res = append(res, errors.Required("body", "body"))
+			} else {
+				res = append(res, errors.NewParseError("body", "body", "", err))
+			}
 
-	qVMID, qhkVMID, _ := qs.GetOK("vm_id")
-	if err := o.bindVMID(qVMID, qhkVMID, route.Formats); err != nil {
-		res = append(res, err)
+		} else {
+
+			if len(res) == 0 {
+				o.Body = body
+			}
+		}
+
+	} else {
+		res = append(res, errors.Required("body", "body"))
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-func (o *ReturnVMParams) bindVMID(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("vm_id", "query")
-	}
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-	if err := validate.RequiredString("vm_id", "query", raw); err != nil {
-		return err
-	}
-
-	value, err := swag.ConvertInt32(raw)
-	if err != nil {
-		return errors.InvalidType("vm_id", "query", "int32", raw)
-	}
-	o.VMID = value
-
 	return nil
 }
