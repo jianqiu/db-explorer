@@ -199,4 +199,6 @@ func appendSSLConnectionStringParam(logger lager.Logger, driverName, databaseCon
 			databaseConnectionString = fmt.Sprintf("%s?sslmode=verify-ca&sslrootcert=%s", databaseConnectionString, sqlCACertFile)
 		}
 	}
+
+	return databaseConnectionString
 }
