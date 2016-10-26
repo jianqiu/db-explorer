@@ -29,8 +29,12 @@ exitChan chan struct{},
 	emitter := middleware.NewLatencyEmitter(logger)
 
 	actions := rata.Handlers{
-		// Tasks
+		vps.AllVMsRoute: route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.AllVirtualGuests))),
+		vps.VMRoute: route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.VirtualGuest))),
 		vps.VMsRoute:  route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.VirtualGuests))),
+		vps.VMCreateRoute: route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.CreateVM))),
+		vps.VMDeleteRoute: route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.DeleteVM))),
+		vps.VMUpdateRoute: route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.UpdateVM))),
 	}
 
 	handler, err := rata.NewRouter(vps.Routes, actions)
@@ -61,8 +65,6 @@ func parseRequest(logger lager.Logger, req *http.Request, request MessageValidat
 		logger.Error("failed-to-parse-request-body", err)
 		return models.ErrBadRequest
 	}
-
-	logger.Debug("filter content", lager.Data{"filter" : request})
 
 	if err := request.Validate(); err != nil {
 		logger.Error("invalid-request", err)

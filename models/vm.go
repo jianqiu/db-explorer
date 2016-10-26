@@ -2,7 +2,18 @@ package models
 
 import (
 	"fmt"
+	"encoding/json"
 )
+
+type VMFilter struct {
+	CID int32
+	IP string
+	CPU int32
+	Memory_mb int32
+	PublicVlan int32
+	PrivateVlan int32
+	State	    State
+}
 
 type State string
 
@@ -12,6 +23,33 @@ const (
 	StateInUse        State = "using"
 	StateUnknown      State = "unknown"
 )
+
+type StateValue struct {
+	State       State  `json:"state"`
+}
+
+func (stateValue *StateValue) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, stateValue)
+}
+
+func (stateValue *StateValue) Validate() error {
+	var validationError ValidationError
+
+	switch stateValue.State {
+	case StateFree:
+	case StateProvision:
+	case StateInUse:
+	case StateUnknown:
+	default:
+		validationError = validationError.Append(ErrInvalidField{"state"})
+	}
+
+	if !validationError.Empty() {
+		return validationError
+	}
+
+	return nil
+}
 
 type VM struct {
 	Hostname       string             `json:"hostname"`
@@ -27,18 +65,8 @@ type VM struct {
 	UpdatedAt      int64              `json:"updated_at"`
 }
 
-type StateValue struct {
-	State       State  `json:"state"`
-}
-
-type VMFilter struct {
-	CID int32
-	IP string
-	CPU int32
-	Memory_mb int32
-	PublicVlan int32
-	PrivateVlan int32
-	State	    State
+func (vm *VM) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, vm)
 }
 
 func (vm *VM) Validate() error {

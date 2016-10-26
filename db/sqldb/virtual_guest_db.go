@@ -16,8 +16,13 @@ func (db *SQLDB) VirtualGuests(logger lager.Logger, filter models.VMFilter) ([]*
 	wheres := []string{}
 	values := []interface{}{}
 
-	if filter.CID != 0 {
-		wheres = append(wheres, "cid = ?")
+	if filter.CPU != 0 {
+		wheres = append(wheres, "cpu = ?")
+		values = append(values, filter.CID)
+	}
+
+	if filter.Memory_mb != 0 {
+		wheres = append(wheres, "memory_mb = ?")
 		values = append(values, filter.CID)
 	}
 
@@ -99,7 +104,7 @@ func (db *SQLDB) InsertVirtualGuestToPool(logger lager.Logger, virtualGuest *mod
 			"memory_mb":         virtualGuest.MemoryMb,
 			"public_vlan":	     virtualGuest.PublicVlan,
 			"private_vlan":      virtualGuest.PrivateVlan,
-			"create_at":          now,
+			"created_at":         now,
 			"updated_at":         now,
 			"deployment_name":    virtualGuest.DeploymentName,
 			"state":              "free",
@@ -113,10 +118,8 @@ func (db *SQLDB) InsertVirtualGuestToPool(logger lager.Logger, virtualGuest *mod
 	return nil
 }
 
-func (db *SQLDB) ChangeVirtualGuestToProvision(logger lager.Logger, cid int32) (bool, error) {
+func (db *SQLDB) ChangeVirtualGuestToProvision(logger lager.Logger, cid int32) error {
 	logger = logger.Session("update-virtual-guest-to-in-use", lager.Data{"cid": cid})
-
-	var started bool
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
 		task, err := db.fetchTaskForUpdate(logger, cid, tx)
@@ -144,17 +147,14 @@ func (db *SQLDB) ChangeVirtualGuestToProvision(logger lager.Logger, cid int32) (
 			return db.convertSQLError(err)
 		}
 
-		started = true
 		return nil
 	})
 
-	return started, err
+	return err
 }
 
-func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) (bool, error) {
-	logger = logger.Session("update-virtual-guest-to-in-use", lager.Data{"cid": cid})
-
-	var started bool
+func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) error {
+	logger = logger.Session("update-vm-to-use", lager.Data{"cid": cid})
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
 		task, err := db.fetchTaskForUpdate(logger, cid, tx)
@@ -182,17 +182,14 @@ func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) (bool, 
 			return db.convertSQLError(err)
 		}
 
-		started = true
 		return nil
 	})
 
-	return started, err
+	return err
 }
 
-func (db *SQLDB) ChangeVirtualGuestToFree(logger lager.Logger, cid int32) (bool, error) {
+func (db *SQLDB) ChangeVirtualGuestToFree(logger lager.Logger, cid int32) error {
 	logger = logger.Session("update-virtual-guest-to-deleted", lager.Data{"cid": cid})
-
-	var started bool
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
 		task, err := db.fetchTaskForUpdate(logger, cid, tx)
@@ -220,11 +217,10 @@ func (db *SQLDB) ChangeVirtualGuestToFree(logger lager.Logger, cid int32) (bool,
 			return db.convertSQLError(err)
 		}
 
-		started = true
 		return nil
 	})
 
-	return started, err
+	return err
 }
 
 func (db *SQLDB) DeleteVirtualGuestFromPool(logger lager.Logger, cid int32) error {
