@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"encoding/json"
 
 	vps "github.com/jianqiu/vm-pool-server"
 	"github.com/jianqiu/vm-pool-server/controllers"
@@ -82,13 +83,13 @@ func exitIfUnrecoverable(logger lager.Logger, exitCh chan<- struct{}, err *model
 }
 
 func writeResponse(w http.ResponseWriter, message proto.Message) {
-	responseBytes, err := proto.Marshal(message)
+	responseBytes, err := json.Marshal(message)
 	if err != nil {
 		panic("Unable to encode Proto: " + err.Error())
 	}
 
 	w.Header().Set("Content-Length", strconv.Itoa(len(responseBytes)))
-	w.Header().Set("Content-Type", "application/x-protobuf")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	w.Write(responseBytes)

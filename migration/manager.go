@@ -104,18 +104,13 @@ func (m *Manager) finish(logger lager.Logger, ready chan<- struct{}) {
 
 
 func checkTables(logger lager.Logger, db *sql.DB) bool {
-	tableNames := []string{
-		"virtual_guests",
-	}
-	for _, tableName := range tableNames {
-		var value int
+	var value int
+	db.QueryRow("SELECT 1 FROM information_schema.tables WHERE table_name = 'virtual_guests' LIMIT 1").Scan(&value)
+	if value == 0 {
 		// check whether the table exists before truncating
-		err := db.QueryRow("SELECT 1 FROM ? LIMIT 1;", tableName).Scan(&value)
-		logger.Info("checking tables", lager.Data{"value": value})
-		if err != nil {
-			return true
-		}
+		return true
 	}
+
 	return false
 }
 
