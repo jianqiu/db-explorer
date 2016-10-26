@@ -106,7 +106,7 @@ func (db *SQLDB) countVirtualGuestsByState(logger lager.Logger, q Queryable) (de
 		panic("database flavor not implemented: " + db.flavor)
 	}
 
-	row := db.db.QueryRow(query, models.Deleted, models.Using)
+	row := db.db.QueryRow(query, models.StateFree, models.StateInUse)
 	err := row.Scan(&deletedCount, &usingCount)
 	if err != nil {
 		logger.Error("failed-counting-virtuals", err)

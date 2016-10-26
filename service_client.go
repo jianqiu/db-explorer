@@ -14,7 +14,7 @@ import (
 //go:generate counterfeiter -o fake_vps/fake_service_client.go . ServiceClient
 
 type ServiceClient interface {
-	VirtualGuestById(logger lager.Logger, cid int32) (*models.VirtualGuest, error)
+	VirtualGuestById(logger lager.Logger, cid int32) (*models.VM, error)
 }
 
 type serviceClient struct {
@@ -27,7 +27,7 @@ func NewServiceClient(username string, apikey string) ServiceClient {
 	}
 }
 
-func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*models.VirtualGuest, error) {
+func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*models.VM, error) {
 	service := services.GetVirtualGuestService(slc.Session)
 	mask := "mask[id, globalIdentifier, hostname, domain, fullyQualifiedDomainName, status.name, " +
 	"powerState.name, activeTransaction, datacenter.name, " +
@@ -43,7 +43,7 @@ func (slc *serviceClient) VirtualGuestById(logger lager.Logger, cid int32) (*mod
 		return nil, convertSoftlayerError(apiErr)
 	}
 
-	virtual_guest := models.VirtualGuest{}
+	virtual_guest := models.VM{}
 
 	virtual_guest.Cid = int32(*sl_virtual_guest.Id)
 	virtual_guest.Hostname = *sl_virtual_guest.Hostname

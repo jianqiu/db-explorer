@@ -107,10 +107,10 @@ func (err ErrInvalidModification) Error() string {
 	return "attempt to make invalid change to field: " + err.InvalidField
 }
 
-func NewTaskTransitionError(from, to VirtualGuest_State) *Error {
+func NewTaskTransitionError(from, to State) *Error {
 	return &Error{
 		Type:    Error_InvalidStateTransition,
-		Message: fmt.Sprintf("Cannot transition from %s to %s", from.String(), to.String()),
+		Message: fmt.Sprintf("Cannot transition from %v to %v", from, to),
 	}
 }
 

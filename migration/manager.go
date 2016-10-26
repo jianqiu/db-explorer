@@ -160,7 +160,7 @@ const createVirtualGuestsSQL = `CREATE TABLE virtual_guests(
 	private_vlan INT NOT NULL,
 	public_vlan INT NOT NULL,
 	deployment_name VARCHAR(255) NOT NULL DEFAULT '',
-	state INT NOT NULL,
+	state VARCHAR(255) NOT NULL,
 	updated_at BIGINT DEFAULT 0,
 	created_at BIGINT DEFAULT 0
 );`

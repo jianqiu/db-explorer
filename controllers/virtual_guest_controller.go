@@ -22,10 +22,10 @@ func NewVirtualGuestController(
 	}
 }
 
-func (h *VirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan, privateVlan, cpu, memory_mb int32) ([]*models.VirtualGuest, error) {
+func (h *VirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan, privateVlan, cpu, memory_mb int32) ([]*models.VM, error) {
 	logger = logger.Session("vms")
 
-	filter := models.VirtualGuestFilter{
+	filter := models.VMFilter{
 		CPU: cpu,
 		Memory_mb: memory_mb,
 		PublicVlan: publicVlan,
@@ -35,7 +35,7 @@ func (h *VirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan, 
 	return h.db.VirtualGuests(logger, filter)
 }
 
-func (h *VirtualGuestController) VirtualGuestByCid(logger lager.Logger, cid int32) (*models.VirtualGuest, error) {
+func (h *VirtualGuestController) VirtualGuestByCid(logger lager.Logger, cid int32) (*models.VM, error) {
 	logger = logger.Session("vm-by-guid")
 	return h.db.VirtualGuestByCID(logger, cid)
 }

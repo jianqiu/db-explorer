@@ -10,11 +10,11 @@ import (
 )
 
 type FakeDB struct {
-	VirtualGuestsStub        func(logger lager.Logger, filter models.VirtualGuestFilter) ([]*models.VirtualGuest, error)
+	VirtualGuestsStub        func(logger lager.Logger, filter models.VMFilter) ([]*models.VirtualGuest, error)
 	virtualGuestsMutex       sync.RWMutex
 	virtualGuestsArgsForCall []struct {
 		logger lager.Logger
-		filter models.VirtualGuestFilter
+		filter models.VMFilter
 	}
 	virtualGuestsReturns struct {
 		result1 []*models.VirtualGuest
@@ -83,11 +83,11 @@ type FakeDB struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeDB) VirtualGuests(logger lager.Logger, filter models.VirtualGuestFilter) ([]*models.VirtualGuest, error) {
+func (fake *FakeDB) VirtualGuests(logger lager.Logger, filter models.VMFilter) ([]*models.VirtualGuest, error) {
 	fake.virtualGuestsMutex.Lock()
 	fake.virtualGuestsArgsForCall = append(fake.virtualGuestsArgsForCall, struct {
 		logger lager.Logger
-		filter models.VirtualGuestFilter
+		filter models.VMFilter
 	}{logger, filter})
 	fake.recordInvocation("VirtualGuests", []interface{}{logger, filter})
 	fake.virtualGuestsMutex.Unlock()
@@ -104,7 +104,7 @@ func (fake *FakeDB) VirtualGuestsCallCount() int {
 	return len(fake.virtualGuestsArgsForCall)
 }
 
-func (fake *FakeDB) VirtualGuestsArgsForCall(i int) (lager.Logger, models.VirtualGuestFilter) {
+func (fake *FakeDB) VirtualGuestsArgsForCall(i int) (lager.Logger, models.VMFilter) {
 	fake.virtualGuestsMutex.RLock()
 	defer fake.virtualGuestsMutex.RUnlock()
 	return fake.virtualGuestsArgsForCall[i].logger, fake.virtualGuestsArgsForCall[i].filter
