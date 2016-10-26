@@ -16,7 +16,7 @@ import (
 
 // This file is safe to edit. Once it exists it will not be overwritten
 
-//go:generate swagger generate server --target .. --name vm-pool-server --spec ../docs/vm_pool_server_api.json
+//go:generate swagger generate server --target .. --name vm-pool --spec ../docs/vm_pool_server_api.json
 
 func configureFlags(api *operations.VMPoolServerAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -44,20 +44,40 @@ func configureAPI(api *operations.VMPoolServerAPI) http.Handler {
 		requestVM := pool.NewRequestVMOK()
 		vm := models.VM{
 			CPU:         params.Body.CPU,
-			Deployment:  "test-deployment",
-			Hostname:    "test-hostname",
+			Deployment:  "",
+			Hostname:    "",
 			Memory:      params.Body.Memory,
-			PrivateIP:   "10.0.0.99",
+			PrivateIP:   "",
 			PrivateVlan: params.Body.PrivateVlan,
 			PublicVlan:  params.Body.PublicVlan,
-			Status:      "in_req",
-			VMID:        params.Body.VMID,
+			Status:      "",
+			VMID:        0,
 		}
 		requestVM.SetPayload(&vm)
 		return requestVM
 	})
 	api.PoolReturnVMHandler = pool.ReturnVMHandlerFunc(func(params pool.ReturnVMParams) middleware.Responder {
-		return middleware.NotImplemented("operation pool.ReturnVM has not yet been implemented")
+		returnVM := pool.NewReturnVMOK()
+
+		//To-do: Get all properties through SL API
+
+		vm := models.VM{
+			CPU:         4,
+			Deployment:  "",
+			Hostname:    "test-hostname-1.softlayer.com",
+			Memory:      32768,
+			PrivateIP:   "10.0.0.1",
+			PrivateVlan: 123456,
+			PublicVlan:  123457,
+			Status:      "free",
+			VMID:        params.Body.VMID,
+		}
+
+		//To-do: Insert to DB
+		vm.CPU = 4
+
+		return returnVM
+
 	})
 
 	api.ServerShutdown = func() {}

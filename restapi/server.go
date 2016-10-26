@@ -31,7 +31,7 @@ func init() {
 	}
 }
 
-// NewServer creates a new api VM pool server but does not configure it
+// NewServer creates a new api VM pool server server but does not configure it
 func NewServer(api *operations.VMPoolServerAPI) *Server {
 	s := new(Server)
 	s.api = api
@@ -52,11 +52,11 @@ func (s *Server) ConfigureFlags() {
 	}
 }
 
-// Server for the VM pool API
+// Server for the VM pool server API
 type Server struct {
 	EnabledListeners []string `long:"scheme" description:"the listeners to enable, this can be repeated and defaults to the schemes in the swagger spec"`
 
-	SocketPath    flags.Filename `long:"socket-path" description:"the unix socket to listen on" default:"/var/run/vm-pool.sock"`
+	SocketPath    flags.Filename `long:"socket-path" description:"the unix socket to listen on" default:"/var/run/vm-pool-server.sock"`
 	domainSocketL net.Listener
 
 	Host        string `long:"host" description:"the IP to listen on" default:"localhost" env:"HOST"`
@@ -136,13 +136,13 @@ func (s *Server) Serve() (err error) {
 		domainSocket.Handler = s.handler
 
 		wg.Add(1)
-		s.Logf("Serving VM pool at unix://%s", s.SocketPath)
+		s.Logf("Serving VM pool server at unix://%s", s.SocketPath)
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := domainSocket.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving VM pool at unix://%s", s.SocketPath)
+			s.Logf("Stopped serving VM pool server at unix://%s", s.SocketPath)
 		}(s.domainSocketL)
 	}
 
@@ -153,13 +153,13 @@ func (s *Server) Serve() (err error) {
 		httpServer.Handler = s.handler
 
 		wg.Add(1)
-		s.Logf("Serving VM pool at http://%s", s.httpServerL.Addr())
+		s.Logf("Serving VM pool server at http://%s", s.httpServerL.Addr())
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := httpServer.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving VM pool at http://%s", l.Addr())
+			s.Logf("Stopped serving VM pool server at http://%s", l.Addr())
 		}(s.httpServerL)
 	}
 
@@ -183,13 +183,13 @@ func (s *Server) Serve() (err error) {
 		}
 
 		wg.Add(1)
-		s.Logf("Serving VM pool at https://%s", s.httpsServerL.Addr())
+		s.Logf("Serving VM pool server at https://%s", s.httpsServerL.Addr())
 		go func(l net.Listener) {
 			defer wg.Done()
 			if err := httpsServer.Serve(l); err != nil {
 				s.Fatalf("%v", err)
 			}
-			s.Logf("Stopped serving VM pool at https://%s", l.Addr())
+			s.Logf("Stopped serving VM pool server at https://%s", l.Addr())
 		}(tls.NewListener(s.httpsServerL, httpsServer.TLSConfig))
 	}
 
