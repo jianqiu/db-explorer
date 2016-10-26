@@ -182,8 +182,8 @@ func (l *ListenerConn) listenerConnLoop() (err error) {
 	}
 }
 
-// This is the main routine for the goroutine receiving on the database
-// connection.  Most of the main logic is in listenerConnLoop.
+// This is the cmd routine for the goroutine receiving on the database
+// connection.  Most of the cmd logic is in listenerConnLoop.
 func (l *ListenerConn) listenerConnMain() {
 	err := l.listenerConnLoop()
 

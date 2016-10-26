@@ -813,7 +813,7 @@ func (p *paragraph) assignLevelsToCharactersRemovedByX9() {
 		}
 	}
 	// now propagate forward the levels information (could have
-	// propagated backward, the main thing is not to introduce a level
+	// propagated backward, the cmd thing is not to introduce a level
 	// break where one doesn't already exist).
 
 	if p.resultLevels[0] == -1 {

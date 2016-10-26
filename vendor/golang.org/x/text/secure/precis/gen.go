@@ -155,7 +155,7 @@ var exceptions = map[rune]exception{
 	0x3007: {prop: pValid},
 
 	// ContextO|J rules are marked as disallowed, taking a "guilty until proven
-	// innocent" approach. The main reason for this is that the check for
+	// innocent" approach. The cmd reason for this is that the check for
 	// whether a context rule should be applied can be moved to the logic for
 	// handing disallowed runes, taken it off the common path. The exception to
 	// this rule is for katakanaMiddleDot, as the rule logic is handled without

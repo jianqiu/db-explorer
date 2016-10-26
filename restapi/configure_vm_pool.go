@@ -39,23 +39,8 @@ func configureAPI(api *operations.VMPoolServerAPI) http.Handler {
 	api.VmsGetVmsHandler = vms.GetVmsHandlerFunc(func(params vms.GetVmsParams) middleware.Responder {
 		return middleware.NotImplemented("operation vms.GetVms has not yet been implemented")
 	})
-	api.PoolRequestVMHandler = pool.RequestVMHandlerFunc(func(params pool.RequestVMParams) middleware.Responder {
+	api.PoolRequestVMHandler = pool.RequestVMHandlerFunc(RequestVMHandleFunc)
 
-		requestVM := pool.NewRequestVMOK()
-		vm := models.VM{
-			CPU:         params.Body.CPU,
-			Deployment:  "",
-			Hostname:    "",
-			Memory:      params.Body.Memory,
-			PrivateIP:   "",
-			PrivateVlan: params.Body.PrivateVlan,
-			PublicVlan:  params.Body.PublicVlan,
-			Status:      "",
-			VMID:        0,
-		}
-		requestVM.SetPayload(&vm)
-		return requestVM
-	})
 	api.PoolReturnVMHandler = pool.ReturnVMHandlerFunc(func(params pool.ReturnVMParams) middleware.Responder {
 		returnVM := pool.NewReturnVMOK()
 

@@ -56,7 +56,7 @@ import (
 //
 // A trivial example server is:
 //
-//	package main
+//	package cmd
 //
 //	import (
 //		"io"
@@ -70,7 +70,7 @@ import (
 //		io.WriteString(w, "hello, "+req.URL.Query().Get(":name")+"!\n")
 //	}
 //
-//	func main() {
+//	func cmd() {
 //		m := pat.New()
 //		m.Get("/hello/:name", http.HandlerFunc(HelloServer))
 //

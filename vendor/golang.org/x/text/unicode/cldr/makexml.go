@@ -55,7 +55,7 @@ func main() {
 				b.write()
 				if b.version != "" && version != b.version {
 					println(f.Name)
-					log.Fatalf("main: inconsistent versions: found %s; want %s", b.version, version)
+					log.Fatalf("cmd: inconsistent versions: found %s; want %s", b.version, version)
 				}
 				break
 			}

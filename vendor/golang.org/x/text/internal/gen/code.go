@@ -335,5 +335,5 @@ func (w *CodeWriter) WriteType(x interface{}) string {
 // typeName returns the name of the go type of x.
 func typeName(x interface{}) string {
 	t := reflect.ValueOf(x).Type()
-	return strings.Replace(fmt.Sprint(t), "main.", "", 1)
+	return strings.Replace(fmt.Sprint(t), "cmd.", "", 1)
 }

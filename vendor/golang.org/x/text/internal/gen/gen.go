@@ -263,14 +263,14 @@ func WriteGo(w io.Writer, pkg string, b []byte) (n int, err error) {
 	return w.Write(formatted)
 }
 
-// Repackage rewrites a Go file from belonging to package main to belonging to
+// Repackage rewrites a Go file from belonging to package cmd to belonging to
 // the given package.
 func Repackage(inFile, outFile, pkg string) {
 	src, err := ioutil.ReadFile(inFile)
 	if err != nil {
 		log.Fatalf("reading %s: %v", inFile, err)
 	}
-	const toDelete = "package main\n\n"
+	const toDelete = "package cmd\n\n"
 	i := bytes.Index(src, []byte(toDelete))
 	if i < 0 {
 		log.Fatalf("Could not find %q in %s.", toDelete, inFile)

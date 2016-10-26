@@ -39,7 +39,6 @@ var (
 		virtualGuests + ".private_vlan",
 		virtualGuests + ".public_vlan",
 		virtualGuests + ".deployment_name",
-		virtualGuests + ".state",
 	}
 )
 

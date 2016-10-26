@@ -10,18 +10,21 @@ import (
 	"errors"
 	"database/sql"
 
+	"github.com/go-openapi/loads"
+
+	"github.com/jianqiu/vm-pool-server/config"
+
+	"github.com/jianqiu/vm-pool-server/restapi"
+	"github.com/jianqiu/vm-pool-server/restapi/operations"
+
 	"code.cloudfoundry.org/cflager"
 	"code.cloudfoundry.org/lager"
 	"code.cloudfoundry.org/clock"
-	vps "github.com/jianqiu/vm-pool-server"
-	"github.com/jianqiu/vm-pool-server/db"
 	"github.com/jianqiu/vm-pool-server/db/sqldb"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jianqiu/vm-pool-server/migration"
-	"github.com/jianqiu/vm-pool-server/handlers"
 	"github.com/tedsuo/ifrit"
 	"github.com/tedsuo/ifrit/grouper"
-	"github.com/tedsuo/ifrit/http_server"
 	"github.com/tedsuo/ifrit/sigmon"
 )
 
@@ -29,12 +32,6 @@ var accessLogPath = flag.String(
 	"accessLogPath",
 	"",
 	"Location of the access log",
-)
-
-var listenAddress = flag.String(
-	"listenAddress",
-	"",
-	"The host:port that the server is bound to.",
 )
 
 var databaseConnectionString = flag.String(
@@ -69,11 +66,26 @@ func main() {
 	logger, _ := cflager.New("vps")
 	logger.Info("starting")
 
+	go func () {
+		swaggerSpec, err := loads.Analyzed(restapi.SwaggerJSON, "")
+		if err != nil {
+			logger.Fatal("Load Swagger Json failed",err)
+		}
+
+		api := operations.NewVMPoolServerAPI(swaggerSpec)
+		server := restapi.NewServer(api)
+		defer server.Shutdown()
+
+		server.ConfigureFlags()
+		server.ConfigureAPI()
+
+		if err := server.Serve(); err != nil {
+			logger.Fatal("Load Swagger Json failed",err)
+		}
+	}()
+
 	clock := clock.NewClock()
 
-	serviceClient := vps.NewServiceClient("cuixuex@cn.ibm.com","7eab8fbfcdda3249e780dce0b10c7e4794e5ccd0fc9af7221b9fa9b40924ba8a")
-
-	var activeDB db.DB
 	var sqlDB *sqldb.SQLDB
 	var sqlConn *sql.DB
 
@@ -99,10 +111,10 @@ func main() {
 		if err != nil {
 			logger.Fatal("sql-failed-create-configurations-table", err)
 		}
-		activeDB = sqlDB
+		config.ActiveDB = sqlDB
 	}
 
-	if activeDB == nil {
+	if config.ActiveDB == nil {
 		logger.Fatal("no-database-configured", errors.New("no database configured"))
 	}
 
@@ -130,21 +142,7 @@ func main() {
 		accessLogger.RegisterSink(lager.NewWriterSink(file, lager.INFO))
 	}
 
-	handler := handlers.New(
-		logger,
-		accessLogger,
-		activeDB,
-		serviceClient,
-		migrationsDone,
-		exitChan,
-	)
-
-	var server ifrit.Runner
-
-	server = http_server.New(*listenAddress, handler)
-
 	members := grouper.Members{
-		{"server", server},
 		{"migration-manager", migrationManager},
 	}
 
@@ -158,8 +156,6 @@ func main() {
 		monitor.Signal(os.Interrupt)
 	}()
 
-	logger.Info("started")
-
 	err := <-monitor.Wait()
 	if sqlConn != nil {
 		sqlConn.Close()
@@ -168,7 +164,6 @@ func main() {
 		logger.Error("exited-with-failure", err)
 		os.Exit(1)
 	}
-
 	logger.Info("exited")
 }
 

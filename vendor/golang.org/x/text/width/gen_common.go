@@ -6,7 +6,7 @@
 
 package main
 
-// This code is shared between the main code generator and the test code.
+// This code is shared between the cmd code generator and the test code.
 
 import (
 	"flag"

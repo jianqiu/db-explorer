@@ -43,11 +43,15 @@ func (db *SQLDB) VirtualGuests(logger lager.Logger, filter models.VirtualGuestFi
 
 	results := []*models.VirtualGuest{}
 	for rows.Next() {
+		logger.Info("rows next in")
 		task, err := db.fetchVirtualGuest(logger, rows, db.db)
 		if err != nil {
 			logger.Error("failed-fetch", err)
 			return nil, err
 		}
+
+		logger.Debug("rows next",lager.Data{"public vlan:": task.PublicVlan})
+
 		results = append(results, task)
 	}
 
@@ -228,7 +232,6 @@ func (db *SQLDB) fetchTaskForUpdate(logger lager.Logger, cid int32, tx *sql.Tx) 
 func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Queryable) (*models.VirtualGuest, error) {
 	var hostname, ip, deployment_name string
 	var cpu, memory_mb, cid, public_vlan, private_vlan int32
-	var state interface{}
 
 	err := scanner.Scan(
 		&cid,
@@ -239,7 +242,6 @@ func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Q
 		&private_vlan,
 		&public_vlan,
 		&deployment_name,
-		&state,
 	)
 	if err != nil {
 		logger.Error("failed-scanning-row", err)
@@ -255,7 +257,6 @@ func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Q
 		PrivateVlan:      private_vlan,
 		PublicVlan:       public_vlan,
 		DeploymentName:   deployment_name,
-		State:            state.(models.VirtualGuest_State),
 	}
 	return virtualGuest, nil
 }

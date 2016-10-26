@@ -21,11 +21,9 @@ type VirtualGuestHandler struct {
 
 func NewVirtualGuestHandler(
 controller VirtualGuestController,
-exitChan chan<- struct{},
 ) *VirtualGuestHandler {
 	return &VirtualGuestHandler{
 		controller: controller,
-		exitChan:   exitChan,
 	}
 }
 

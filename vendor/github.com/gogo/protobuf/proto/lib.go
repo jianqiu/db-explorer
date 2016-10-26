@@ -222,7 +222,7 @@ The resulting file, test.pb.go, is:
 
 To create and play with a Test object:
 
-	package main
+	package cmd
 
 	import (
 		"log"
@@ -231,7 +231,7 @@ To create and play with a Test object:
 		pb "./example.pb"
 	)
 
-	func main() {
+	func cmd() {
 		test := &pb.Test{
 			Label: proto.String("hello"),
 			Type:  proto.Int32(17),
