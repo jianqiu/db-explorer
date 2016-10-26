@@ -34,7 +34,7 @@ type ReturnVMParams struct {
 	  Required: true
 	  In: body
 	*/
-	Body models.VMID
+	Body *models.VMID
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -54,9 +54,12 @@ func (o *ReturnVMParams) BindRequest(r *http.Request, route *middleware.MatchedR
 			}
 
 		} else {
+			if err := body.Validate(route.Formats); err != nil {
+				res = append(res, err)
+			}
 
 			if len(res) == 0 {
-				o.Body = body
+				o.Body = &body
 			}
 		}
 

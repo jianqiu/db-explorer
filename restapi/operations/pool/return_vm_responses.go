@@ -16,9 +16,6 @@ import (
 swagger:response returnVmOK
 */
 type ReturnVMOK struct {
-
-	// In: body
-	Payload *models.VM `json:"body,omitempty"`
 }
 
 // NewReturnVMOK creates ReturnVMOK with default headers values
@@ -26,26 +23,10 @@ func NewReturnVMOK() *ReturnVMOK {
 	return &ReturnVMOK{}
 }
 
-// WithPayload adds the payload to the return Vm o k response
-func (o *ReturnVMOK) WithPayload(payload *models.VM) *ReturnVMOK {
-	o.Payload = payload
-	return o
-}
-
-// SetPayload sets the payload to the return Vm o k response
-func (o *ReturnVMOK) SetPayload(payload *models.VM) {
-	o.Payload = payload
-}
-
 // WriteResponse to the client
 func (o *ReturnVMOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	if o.Payload != nil {
-		if err := producer.Produce(rw, o.Payload); err != nil {
-			panic(err) // let the recovery middleware deal with this
-		}
-	}
 }
 
 /*ReturnVMDefault unexpected error
