@@ -60,7 +60,7 @@ func parseRequest(logger lager.Logger, req *http.Request, request MessageValidat
 		logger.Error("failed-to-read-body", err)
 		return models.ErrUnknownError
 	}
-
+        logger.Debug("request-body",lager.Data{"content": data})
 	err = request.Unmarshal(data)
 	if err != nil {
 		logger.Error("failed-to-parse-request-body", err)
