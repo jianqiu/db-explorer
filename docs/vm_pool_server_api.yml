@@ -11,7 +11,7 @@ info:
 host: 127.0.0.1
 basePath: /v1
 schemes:
-  - https
+  - http
 produces:
   - application/json
 paths:
@@ -47,12 +47,12 @@ paths:
       description: Return a VM into the pool
       operationId: returnVM
       parameters:
-        - in: query
-          name: vm_id
+        - in: body
+          name: body
           description: VM ID 
           required: true
-          type: integer
-          format: int32
+          schema:
+            $ref: "#/definitions/VMID"
       responses:
         200:
           description: Returning a VM into the pool succeeded
@@ -71,12 +71,12 @@ paths:
       description: Request a VM from the pool
       operationId: requestVM
       parameters:
-        - in: query
-          name: vm_id
-          description: VM ID
-          required: false
-          type: integer
-          format: int32
+        - in: body
+          name: body
+          description: VM
+          required: true
+          schema:
+            $ref: "#/definitions/VM"
       responses:
         200:
           description: Requesting a VM from the pool succeeded
@@ -122,6 +122,9 @@ definitions:
       deployment:
         type: string
         description: The name of the deployment the VM belongs to
+  VMID:
+     type: integer
+     format: int32
   Error:
       type: object
       properties:
