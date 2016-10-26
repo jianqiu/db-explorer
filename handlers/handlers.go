@@ -48,12 +48,6 @@ func route(f http.HandlerFunc) http.Handler {
 	return f
 }
 
-type MessageValidator interface {
-	proto.Message
-	Validate() error
-	Unmarshal(data []byte) error
-}
-
 func parseRequest(logger lager.Logger, req *http.Request, request MessageValidator) error {
 	data, err := ioutil.ReadAll(req.Body)
 	if err != nil {

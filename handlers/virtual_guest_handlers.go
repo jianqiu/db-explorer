@@ -5,6 +5,7 @@ import (
 
 	"github.com/jianqiu/vm-pool-server/models"
 	"code.cloudfoundry.org/lager"
+	"github.com/gogo/protobuf/proto"
 )
 
 //go:generate counterfeiter -o fake_controllers/fake_virtual_guest_controller.go . VirtualGuestController
@@ -17,6 +18,12 @@ type VirtualGuestController interface {
 type VirtualGuestHandler struct {
 	controller VirtualGuestController
 	exitChan   chan<- struct{}
+}
+
+type MessageValidator interface {
+	proto.Message
+	Validate() error
+	Unmarshal(data []byte) error
 }
 
 func NewVirtualGuestHandler(
