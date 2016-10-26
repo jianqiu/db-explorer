@@ -26,6 +26,8 @@ func (h *VirtualGuestController) VirtualGuests(logger lager.Logger, publicVlan, 
 	logger = logger.Session("vms")
 
 	filter := models.VirtualGuestFilter{
+		CPU: cpu,
+		Memory_mb: memory_mb,
 		PublicVlan: publicVlan,
 		PrivateVlan: privateVlan,
 	}

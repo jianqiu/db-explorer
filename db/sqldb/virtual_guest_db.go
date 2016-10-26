@@ -227,9 +227,7 @@ func (db *SQLDB) fetchTaskForUpdate(logger lager.Logger, cid int32, tx *sql.Tx) 
 
 func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Queryable) (*models.VirtualGuest, error) {
 	var hostname, ip, deployment_name string
-	var cpu, memory_mb, cid, public_vlan, private_vlan int32
-	var state interface{}
-
+	var cpu, memory_mb, cid, public_vlan, private_vlan, state int32
 	err := scanner.Scan(
 		&cid,
 		&hostname,
@@ -245,7 +243,6 @@ func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Q
 		logger.Error("failed-scanning-row", err)
 		return nil, models.ErrResourceNotFound
 	}
-
 	virtualGuest := &models.VirtualGuest {
 		Cid:              cid,
 		Hostname:         hostname,
@@ -255,7 +252,7 @@ func (db *SQLDB) fetchVirtualGuest(logger lager.Logger, scanner RowScanner, tx Q
 		PrivateVlan:      private_vlan,
 		PublicVlan:       public_vlan,
 		DeploymentName:   deployment_name,
-		State:            state.(models.VirtualGuest_State),
 	}
+
 	return virtualGuest, nil
 }

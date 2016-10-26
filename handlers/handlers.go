@@ -29,7 +29,7 @@ exitChan chan struct{},
 
 	actions := rata.Handlers{
 		// Tasks
-		vps.VMsRoute:   route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.VirtualGuests))),
+		vps.VMsRoute:  route(emitter.EmitLatency(middleware.LogWrap(logger, accessLogger, vmHandler.VirtualGuests))),
 	}
 
 	handler, err := rata.NewRouter(vps.Routes, actions)
@@ -54,12 +54,14 @@ func parseRequest(logger lager.Logger, req *http.Request, request MessageValidat
 		logger.Error("failed-to-read-body", err)
 		return models.ErrUnknownError
 	}
-        logger.Debug("request-body",lager.Data{"content": data})
+
 	err = request.Unmarshal(data)
 	if err != nil {
 		logger.Error("failed-to-parse-request-body", err)
 		return models.ErrBadRequest
 	}
+
+	logger.Debug("filter content", lager.Data{"filter" : request})
 
 	if err := request.Validate(); err != nil {
 		logger.Error("invalid-request", err)
