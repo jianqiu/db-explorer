@@ -111,7 +111,7 @@ func (db *SQLDB) InsertVirtualGuestToPool(logger lager.Logger, virtualGuest *mod
 		},
 	)
 	if err != nil {
-		logger.Error("failed-inserting-virtual-guest", err)
+		logger.Error("failed-inserting-vm", err)
 		return db.convertSQLError(err)
 	}
 
@@ -122,14 +122,14 @@ func (db *SQLDB) ChangeVirtualGuestToProvision(logger lager.Logger, cid int32) e
 	logger = logger.Session("update-virtual-guest-to-in-use", lager.Data{"cid": cid})
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
-		task, err := db.fetchTaskForUpdate(logger, cid, tx)
+		vm, err := db.fetchVMForUpdate(logger, cid, tx)
 		if err != nil {
-			logger.Error("failed-locking-virtual-guest", err)
+			logger.Error("failed-locking-vm", err)
 			return err
 		}
 
-		if err = task.ValidateTransitionTo(models.StateProvision); err != nil {
-			logger.Error("failed-to-transition-task-to-running", err)
+		if err = vm.ValidateTransitionTo(models.StateProvision); err != nil {
+			logger.Error("failed-to-transition-vm-to-provisioning", err)
 			return err
 		}
 
@@ -157,14 +157,14 @@ func (db *SQLDB) ChangeVirtualGuestToUse(logger lager.Logger, cid int32) error {
 	logger = logger.Session("update-vm-to-use", lager.Data{"cid": cid})
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
-		task, err := db.fetchTaskForUpdate(logger, cid, tx)
+		vm, err := db.fetchVMForUpdate(logger, cid, tx)
 		if err != nil {
-			logger.Error("failed-locking-virtual-guest", err)
+			logger.Error("failed-locking-vm", err)
 			return err
 		}
 
-		if err = task.ValidateTransitionTo(models.StateInUse); err != nil {
-			logger.Error("failed-to-transition-task-to-running", err)
+		if err = vm.ValidateTransitionTo(models.StateInUse); err != nil {
+			logger.Error("failed-to-transition-vm-to-running", err)
 			return err
 		}
 
@@ -192,14 +192,14 @@ func (db *SQLDB) ChangeVirtualGuestToFree(logger lager.Logger, cid int32) error 
 	logger = logger.Session("update-virtual-guest-to-deleted", lager.Data{"cid": cid})
 
 	err := db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
-		task, err := db.fetchTaskForUpdate(logger, cid, tx)
+		vm, err := db.fetchVMForUpdate(logger, cid, tx)
 		if err != nil {
-			logger.Error("failed-locking-virtual-guest", err)
+			logger.Error("failed-locking-vm", err)
 			return err
 		}
 
-		if err = task.ValidateTransitionTo(models.StateFree); err != nil {
-			logger.Error("failed-to-transition-task-to-deleted", err)
+		if err = vm.ValidateTransitionTo(models.StateFree); err != nil {
+			logger.Error("failed-to-transition-vm-to-free", err)
 			return err
 		}
 
@@ -229,21 +229,21 @@ func (db *SQLDB) DeleteVirtualGuestFromPool(logger lager.Logger, cid int32) erro
 	defer logger.Info("complete")
 
 	return db.transact(logger, func(logger lager.Logger, tx *sql.Tx) error {
-		task, err := db.fetchTaskForUpdate(logger, cid, tx)
+		vm, err := db.fetchVMForUpdate(logger, cid, tx)
 		if err != nil {
-			logger.Error("failed-locking-virtual-guest", err)
+			logger.Error("failed-locking-vm", err)
 			return err
 		}
 
-		if task.State != models.StateFree {
-			err = models.NewTaskTransitionError(task.State, models.StateUnknown)
+		if vm.State != models.StateFree {
+			err = models.NewTaskTransitionError(vm.State, models.StateUnknown)
 			logger.Error("invalid-state-transition", err)
 			return err
 		}
 
 		_, err = db.delete(logger, tx, virtualGuests, "cid = ?", cid)
 		if err != nil {
-			logger.Error("failed-deleting-virtual-guest", err)
+			logger.Error("failed-removing-vm", err)
 			return db.convertSQLError(err)
 		}
 
@@ -251,7 +251,7 @@ func (db *SQLDB) DeleteVirtualGuestFromPool(logger lager.Logger, cid int32) erro
 	})
 }
 
-func (db *SQLDB) fetchTaskForUpdate(logger lager.Logger, cid int32, tx *sql.Tx) (*models.VM, error) {
+func (db *SQLDB) fetchVMForUpdate(logger lager.Logger, cid int32, tx *sql.Tx) (*models.VM, error) {
 	row := db.one(logger, tx, virtualGuests,
 		virtualGuestColumns, LockRow,
 		"cid = ?", cid,
